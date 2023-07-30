@@ -1,11 +1,11 @@
 from flask import Flask
-from app.modules.common.app_utils import app_utils
-from app.modules.common.mongo_utils import mongo_utils
-from app.modules.common.jwt_utils import auth_utils
-from app.modules.user.routes.routes import data_bp
-from app.modules.authentication.routes.auth_routes import auth_bp
-from app.modules.questions.routes.q_routes import question_bp
-from app.modules.answers.routes.ans_routes import answer_bp
+from src.modules.common.app_utils import app_utils
+from src.modules.common.mongo_utils import mongo_utils
+from src.modules.common.jwt_utils import auth_utils
+from src.modules.user.routes.routes import data_bp
+from src.modules.authentication.routes.auth_routes import auth_bp
+from src.modules.questions.routes.q_routes import question_bp
+from src.modules.answers.routes.ans_routes import answer_bp
 from dynaconf import Dynaconf, settings
 import json
 from flask import Flask, request, jsonify
