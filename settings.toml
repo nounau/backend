@@ -1,0 +1,5 @@
+[development]
+MONGO_DB_URL="dev_db_url"
+
+[local]
+MONGO_DB_URL="mongodb://localhost:27017"
