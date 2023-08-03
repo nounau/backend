@@ -7,4 +7,4 @@ class Service:
 
     @staticmethod
     def get_all_data():
-        return Data.get_all_data();
+        return Data.get_all_data()

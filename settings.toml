@@ -1,5 +1,7 @@
+
 [development]
-MONGO_DB_URL="dev_db_url"
+MONGO_DB_URL = "mongodb+srv://root:root123@cluster0.cfbyuz8.mongodb.net/?retryWrites=true&w=majority"
 
 [local]
 MONGO_DB_URL="mongodb://localhost:27017"
+

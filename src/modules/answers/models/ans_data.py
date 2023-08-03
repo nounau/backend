@@ -1,10 +1,11 @@
 from bson import ObjectId
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash
+from dynaconf import settings
 
 from src.modules.common.mongo_utils import mongo_utils
 
-client = MongoClient('mongodb://localhost:27017/')
+client = MongoClient(settings.MONGO_DB_URL)
 db = client['Users'] # Change this!
 answers = db['answers']
 

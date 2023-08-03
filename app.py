@@ -25,7 +25,8 @@ app.register_blueprint(question_bp)
 app.register_blueprint(answer_bp)
 app.secret_key = "secretkey"
 
-app.config['MONGO_URI'] = "mongodb://localhost:27017/Users"
+
+app.config['MONGO_URI'] = settings.MONGO_DB_URL
 app.config["JWT_SECRET_KEY"] = "rohannitiket"
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 
@@ -36,6 +37,5 @@ mongo_utils.set_mongo(PyMongo(app))
 settings = Dynaconf(
     settings_files=["settings.toml"],  # List of configuration files to load
 )
-
 if __name__ == '__main__':
     app.run(debug=True)

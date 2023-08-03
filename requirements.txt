@@ -1,6 +1,6 @@
 Flask
 gunicorn
-pymongo
+pymongo==3.11
 dynaconf
 flask_bcrypt
 flask_jwt_extended
