@@ -12,8 +12,8 @@ class auth_data:
 
     @staticmethod
     def authenticate(email, password):
-        user = users.find_one({'email': email})
-        if user and user['password'] == password:
+        user = users.find_one({'email' : email})
+        if user and check_password_hash(user['password'], password):
             return {'email': user['email']}
         else:
             return None
@@ -51,3 +51,10 @@ class auth_data:
                                        'companyName':_companyName, 'workExperience':_workExperience, 'interests':_interests, 'languages':_languages,
                                         'photo':_photo, 'savedQuestions':_savedQuestions, 'questionsAsked':_questionsAsked, 'answersGiven':_answersGiven, 
                                         'rewards':_rewards, 'guestIpAddress':_guestIpAddress, 'lastActiveTimeStamp':_lastActiveTimeStamp})
+
+    @staticmethod
+    def ifUserExists(email):
+        if len(users.find_one({'email': email})) > 0:
+            return True
+        else:
+            return False

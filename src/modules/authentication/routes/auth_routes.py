@@ -10,6 +10,9 @@ auth_bp = Blueprint('auth_bp', __name__)
  
 def authenticate(email, password):
     return auth_service.authenticate(email, password);
+
+def ifUserExists(email):
+    return auth_service.ifUserExists(email)
     
 def create_token(user):
     # token = jwt.encode({
@@ -23,14 +26,13 @@ def create_token(user):
 def login():
     email = request.json.get('email', None)
     password = request.json.get('password', None)
-
     user = authenticate(email, password)
 
     if not user:
-        return jsonify({'error': 'Invalid credentials'}), 401
+        return jsonify({'ok': False, 'message': 'Invalid credentials', 'response':''}), 401
 
     access_token = create_token(user)
-    return jsonify({'access_token': access_token}), 200
+    return jsonify({'ok': True, 'message': 'Login successful!', 'response':access_token}), 200
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
@@ -63,6 +65,9 @@ def register():
                            _startDate, _endDate, _companyName, _workExperience, _interests, _languages, _photo, 
                            _savedQuestions, _questionsAsked, _answersGiven, _rewards, _guestIpAddress, _lastActiveTimeStamp]
 
+    if ifUserExists(_email):
+        return jsonify({'ok': False, 'message': 'User Already Exists', 'response': ''}), 200
+    
     if _userName and _email and _password and request.method == "POST":
 
         # _hashed_password = generate_password_hash(_password)
@@ -72,7 +77,7 @@ def register():
         #                                'birthdate':_birthdate, 'currentLocation':_currentLocation, 'city':_city, 'degree':_degree, 'startDate':_startDate, 'endDate':_endDate,
         #                                'companyName':_companyName, 'workExperience':_workExperience, 'photo':_photo, 'guestIpAddress':_guestIpAddress, 'lastActiveTimeStamp':_lastActiveTimeStamp})
 
-        return jsonify({'ok': True, 'message': 'User created successfully!'}), 200
+        return jsonify({'ok': True, 'message': 'User created successfully!', 'response': ''}), 200
     else:
         return not_found()
 
@@ -85,8 +90,9 @@ def protected():
 @auth_bp.errorhandler(404)
 def not_found(error=None):
     message = {
-        'status':404,
-        'message':'Not Found' + request.url
+        'ok':False,
+        'message':'Not Found' + request.url,
+        'response':''
     }
     resp = jsonify(message)
     resp.status_code = 404

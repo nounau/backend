@@ -9,3 +9,7 @@ class auth_service:
     @staticmethod
     def register(register_info_array):
         return auth_data.register(register_info_array)
+    
+    @staticmethod
+    def ifUserExists(email):
+        return auth_data.ifUserExists(email)
