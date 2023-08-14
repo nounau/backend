@@ -54,7 +54,11 @@ class auth_data:
 
     @staticmethod
     def ifUserExists(email):
-        if len(users.find_one({'email': email})) > 0:
-            return True
-        else:
+        try:
+            if len(users.find_one({'email': email})) > 0:
+                return True
+            else:
+                return False
+        except TypeError:
+            print("No user Found!")
             return False

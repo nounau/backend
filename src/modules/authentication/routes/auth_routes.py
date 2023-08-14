@@ -65,8 +65,14 @@ def register():
                            _startDate, _endDate, _companyName, _workExperience, _interests, _languages, _photo, 
                            _savedQuestions, _questionsAsked, _answersGiven, _rewards, _guestIpAddress, _lastActiveTimeStamp]
 
+    # try:
     if ifUserExists(_email):
         return jsonify({'ok': False, 'message': 'User Already Exists', 'response': ''}), 200
+    # except TypeError:
+    #     print("No User Found")
+
+    
+    
     
     if _userName and _email and _password and request.method == "POST":
 

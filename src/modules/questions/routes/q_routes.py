@@ -27,7 +27,7 @@ def postQuestion():
         # id = mongo.db.questions.insert_one({'title':_title, 'uId':_uId, 'noOfReposts':_noOfReposts, 'isRealTime':_isRealTime, 
         #                            'createdTimeStamp':_createdTimeStamp, 'updatedTimeStamp':_updatedTimeStamp, 'tags':_tags})
         
-        return jsonify({'ok': True, 'message': 'Question created successfully!'}), 200
+        return jsonify({'ok': True, 'message': 'Question created successfully!', 'response': ''}), 200
     else:
         return not_found()
     
@@ -37,7 +37,7 @@ def getQuestion(id):
     if question:
         resp = json_util.dumps(question)
         #json.loads(json_util.dumps(data))
-        return resp
+        return jsonify({'ok': True, 'message': 'Found Question', 'response': 'resp'}), 200
     else:
         return not_found()
     
@@ -58,22 +58,23 @@ def editQuestion(id):
     question_info_array = [_id, _title, _uId, _savedBy, _noOfReposts, _isRealTime, _createdTimeStamp, _updatedTimeStamp, _tags, _views]
 
 
-    if _title and request.method == "POST":
+    if _title and request.method == "PUT":
         
         id = q_service.updateQuestion(question_info_array)
         # id = mongo.db.questions.update_one({'_id':ObjectId(_id['$oid']) if '$oid' in _id else ObjectId(_id)}, 
         #                               {'$set': {'title':_title, 'noOfReposts':_noOfReposts, 
         #                                     'isRealTime':_isRealTime, 'updatedTimeStamp':_updatedTimeStamp, 'tags':_tags}})
         
-        return jsonify({'ok': True, 'message': 'User updated successfully!'}), 200
+        return jsonify({'ok': True, 'message': 'User updated successfully!', 'response': ''}), 200
     else:
         return not_found()
 
 @question_bp.errorhandler(404)
 def not_found(error=None):
     message = {
-        'status':404,
-        'message':'Not Found' + request.url
+        'ok':False,
+        'message':'Not Found' + request.url,
+        'response':''
     }
     resp = jsonify(message)
  
