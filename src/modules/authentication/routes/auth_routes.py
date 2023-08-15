@@ -19,7 +19,7 @@ def create_token(user):
     #         'user_email': user['email'],
     #         'exp' : datetime.utcnow() + timedelta(minutes = 30)
     #     }, app.config['SECRET_KEY'])
-    token = create_access_token(identity=user['email'])
+    token = create_access_token(identity=user['userId'])
     return token
 
 @auth_bp.route('/login', methods=['POST'])
@@ -27,12 +27,12 @@ def login():
     email = request.json.get('email', None)
     password = request.json.get('password', None)
     user = authenticate(email, password)
-
+    print(user)
     if not user:
-        return jsonify({'ok': False, 'message': 'Invalid credentials', 'response':''}), 401
+        return jsonify({'success': False, 'message': 'Invalid credentials', 'response':''}), 401
 
     access_token = create_token(user)
-    return jsonify({'ok': True, 'message': 'Login successful!', 'response':access_token}), 200
+    return jsonify({'success': True, 'message': 'Login successful!', 'response':access_token}), 200
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
@@ -67,7 +67,7 @@ def register():
 
     # try:
     if ifUserExists(_email):
-        return jsonify({'ok': False, 'message': 'User Already Exists', 'response': ''}), 200
+        return jsonify({'success': False, 'message': 'User Already Exists', 'response': ''}), 200
     # except TypeError:
     #     print("No User Found")
 
@@ -83,7 +83,7 @@ def register():
         #                                'birthdate':_birthdate, 'currentLocation':_currentLocation, 'city':_city, 'degree':_degree, 'startDate':_startDate, 'endDate':_endDate,
         #                                'companyName':_companyName, 'workExperience':_workExperience, 'photo':_photo, 'guestIpAddress':_guestIpAddress, 'lastActiveTimeStamp':_lastActiveTimeStamp})
 
-        return jsonify({'ok': True, 'message': 'User created successfully!', 'response': ''}), 200
+        return jsonify({'success': True, 'message': 'User created successfully!', 'response': ''}), 200
     else:
         return not_found()
 
@@ -91,12 +91,13 @@ def register():
 @jwt_required()
 def protected():
     current_user = get_jwt_identity()
+    print(current_user)
     return jsonify({'message': f'Hello, {current_user}!'}), 200
 
 @auth_bp.errorhandler(404)
 def not_found(error=None):
     message = {
-        'ok':False,
+        'success':False,
         'message':'Not Found' + request.url,
         'response':''
     }

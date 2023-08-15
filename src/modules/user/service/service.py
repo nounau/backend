@@ -8,3 +8,7 @@ class Service:
     @staticmethod
     def get_all_data():
         return Data.get_all_data()
+    
+    @staticmethod
+    def questionsSaved(current_user, questionId):
+        return Data.questionsSaved(current_user, questionId)

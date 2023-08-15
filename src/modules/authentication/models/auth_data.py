@@ -14,7 +14,7 @@ class auth_data:
     def authenticate(email, password):
         user = users.find_one({'email' : email})
         if user and check_password_hash(user['password'], password):
-            return {'email': user['email']}
+            return {'userId': str(user['_id']), 'email': user['email']}
         else:
             return None
     

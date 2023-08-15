@@ -1,16 +1,24 @@
 from json import dumps
 from src.modules.questions.service.q_service import q_service
+from src.modules.user.service.service import Service
 from flask import Blueprint, Flask, request, jsonify
 from datetime import datetime, timedelta, timezone
 from bson import json_util
+from flask_jwt_extended import get_jwt_identity, jwt_required
 
 question_bp = Blueprint('question_bp', __name__)
 
 @question_bp.route('/postquestion', methods=['POST'])
+@jwt_required()
 def postQuestion():
+    current_user = get_jwt_identity()
+    if not current_user:
+        return jsonify({'success': False, 'message': 'UnAutorized Access', 'response': ''}), 401
+    print(current_user)
+    
     _json = request.json
     _title = _json['title']
-    _uId = _json['uId']
+    _userId = current_user
     _savedBy = _json['savedBy']
     _noOfReposts = _json['noOfReposts']
     _isRealTime = _json['isRealTime']
@@ -19,7 +27,7 @@ def postQuestion():
     _tags = _json['tags']
     _views = _json['views']
 
-    question_info_array = [_title, _uId, _savedBy, _noOfReposts, _isRealTime, _createdTimeStamp, _updatedTimeStamp, _tags, _views]
+    question_info_array = [_title, _userId, _savedBy, _noOfReposts, _isRealTime, _createdTimeStamp, _updatedTimeStamp, _tags, _views]
 
     if _title and request.method == "POST":
 
@@ -27,26 +35,38 @@ def postQuestion():
         # id = mongo.db.questions.insert_one({'title':_title, 'uId':_uId, 'noOfReposts':_noOfReposts, 'isRealTime':_isRealTime, 
         #                            'createdTimeStamp':_createdTimeStamp, 'updatedTimeStamp':_updatedTimeStamp, 'tags':_tags})
         
-        return jsonify({'ok': True, 'message': 'Question created successfully!', 'response': ''}), 200
+        return jsonify({'success': True, 'message': 'Question created successfully!', 'response': ''}), 200
     else:
         return not_found()
     
-@question_bp.route('/getquestion/<id>', methods=['GET'])
-def getQuestion(id):
-    question = q_service.getQuestionById(id)
+@question_bp.route('/getquestion', methods=['POST'])
+@jwt_required()
+def getQuestion():
+    current_user = get_jwt_identity()
+    if not current_user:
+        return jsonify({'success': False, 'message': 'UnAutorized Access', 'response': ''}), 401
+    # print(current_user)
+    
+    _json = request.json
+    id = _json['questionId']
+    # print(id)
+    question = q_service.getQuestionById(id, current_user)
     if question:
         resp = json_util.dumps(question)
-        #json.loads(json_util.dumps(data))
-        return jsonify({'ok': True, 'message': 'Found Question', 'response': 'resp'}), 200
+        return jsonify({'success': True, 'message': 'Found Question', 'response': resp}), 200
     else:
         return not_found()
     
-@question_bp.route('/updatequestion/<id>', methods=['PUT'])
-def editQuestion(id):
-    _id = id
+@question_bp.route('/updatequestion', methods=['POST'])
+@jwt_required()
+def editQuestion():
+    current_user = get_jwt_identity()
+    if not current_user:
+        return jsonify({'success': False, 'message': 'UnAutorized Access', 'response': ''}), 401
     _json = request.json
+    _id = _json['questionId']
     _title = _json['title']
-    _uId = _json['uId']
+    _userId = current_user
     _savedBy = _json['savedBy']
     _noOfReposts = _json['noOfReposts']
     _isRealTime = _json['isRealTime']
@@ -55,24 +75,38 @@ def editQuestion(id):
     _tags = _json['tags']
     _views = _json['views']
 
-    question_info_array = [_id, _title, _uId, _savedBy, _noOfReposts, _isRealTime, _createdTimeStamp, _updatedTimeStamp, _tags, _views]
+    question_info_array = [_id, _title, _userId, _savedBy, _noOfReposts, _isRealTime, _createdTimeStamp, _updatedTimeStamp, _tags, _views]
 
 
-    if _title and request.method == "PUT":
+    if _title and request.method == "POST":
         
         id = q_service.updateQuestion(question_info_array)
-        # id = mongo.db.questions.update_one({'_id':ObjectId(_id['$oid']) if '$oid' in _id else ObjectId(_id)}, 
-        #                               {'$set': {'title':_title, 'noOfReposts':_noOfReposts, 
-        #                                     'isRealTime':_isRealTime, 'updatedTimeStamp':_updatedTimeStamp, 'tags':_tags}})
         
-        return jsonify({'ok': True, 'message': 'User updated successfully!', 'response': ''}), 200
+        return jsonify({'success': True, 'message': 'User updated successfully!', 'response': ''}), 200
     else:
         return not_found()
+    
+@question_bp.route('/savedby', methods=['POST'])
+@jwt_required()
+def savedBy():
+    current_user = get_jwt_identity()
+    if not current_user:
+        return jsonify({'success': False, 'message': 'UnAutorized Access', 'response': ''}), 401
+    _json = request.json
+    questionId = _json['questionId']
+
+    if current_user and questionId and request.method == "POST":
+        questionSavedBy = q_service.savedBy(current_user, questionId)
+        userQuestionsSaved = Service.questionsSaved(current_user, questionId)
+        return jsonify({'success': True, 'message': {userQuestionsSaved, questionSavedBy}, 'response': ''}), 200
+    else:
+        return not_found()
+    
 
 @question_bp.errorhandler(404)
 def not_found(error=None):
     message = {
-        'ok':False,
+        'success':False,
         'message':'Not Found' + request.url,
         'response':''
     }

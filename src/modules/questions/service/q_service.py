@@ -7,9 +7,13 @@ class q_service:
         return q_data.postQuestion(question_info_array)
     
     @staticmethod
-    def getQuestionById(id):
-        return q_data.getQuestionById(id)
+    def getQuestionById(id, current_user):
+        return q_data.getQuestionById(id, current_user)
     
     @staticmethod
     def updateQuestion(question_info_array):
         return q_data.updateQuestion(question_info_array)
+    
+    @staticmethod
+    def savedBy(current_user, questionId):
+        return q_data.savedBy(current_user, questionId)

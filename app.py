@@ -28,7 +28,7 @@ app.secret_key = "secretkey"
 
 app.config['MONGO_URI'] = settings.MONGO_DB_URL
 app.config["JWT_SECRET_KEY"] = "rohannitiket"
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=2)
 
 app_utils.set_app(app)
 auth_utils.set_auth_objects(Bcrypt(app), JWTManager(app))

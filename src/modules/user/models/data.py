@@ -1,3 +1,4 @@
+from bson import ObjectId
 from pymongo import MongoClient
 from dynaconf import settings
 from src.modules.common.mongo_utils import mongo_utils
@@ -17,3 +18,19 @@ class Data:
     def add_data(data):
         # collection.insert_one(data)
         return None
+    
+    @staticmethod
+    def questionsSaved(current_user, questionId):
+        mongo = mongo_utils.get_mongo()
+        result = mongo.db.users.find_one({'_id':ObjectId(current_user)})
+        if result:
+            if questionId not in result['savedQuestions']:
+                result['savedQuestions'].append(questionId)
+                mongo.db.users.update_one({'_id':ObjectId(current_user['$oid']) if '$oid' in current_user else ObjectId(current_user)}, 
+                                      {'$set': {'savedQuestions':result['savedQuestions']}})
+                return "Saved Question!"
+            else:
+                return "Already Saved!"
+        return result
+    
+
