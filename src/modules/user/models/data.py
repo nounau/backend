@@ -22,11 +22,12 @@ class Data:
     @staticmethod
     def questionsSaved(current_user, questionId):
         mongo = mongo_utils.get_mongo()
-        result = mongo.db.users.find_one({'_id':ObjectId(current_user)})
+        result = mongo.db.user.find_one({'_id':ObjectId(current_user)})
         if result:
             if questionId not in result['savedQuestions']:
                 result['savedQuestions'].append(questionId)
-                mongo.db.users.update_one({'_id':ObjectId(current_user['$oid']) if '$oid' in current_user else ObjectId(current_user)}, 
+                print(result['savedQuestions'])
+                mongo.db.user.update_one({'_id':ObjectId(current_user['$oid']) if '$oid' in current_user else ObjectId(current_user)}, 
                                       {'$set': {'savedQuestions':result['savedQuestions']}})
                 return "Saved Question!"
             else:

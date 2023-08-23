@@ -98,7 +98,8 @@ def savedBy():
     if current_user and questionId and request.method == "POST":
         questionSavedBy = q_service.savedBy(current_user, questionId)
         userQuestionsSaved = Service.questionsSaved(current_user, questionId)
-        return jsonify({'success': True, 'message': {userQuestionsSaved, questionSavedBy}, 'response': ''}), 200
+        # result = questionSavedBy + userQuestionsSaved
+        return jsonify({'success': True, 'message': userQuestionsSaved, 'response': ''}), 200
     else:
         return not_found()
     

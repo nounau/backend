@@ -67,7 +67,8 @@ class q_data:
         if result:
             if current_user not in result['savedBy']:
                 result['savedBy'].append(current_user)
-                mongo.db.users.update_one({'_id':ObjectId(questionId['$oid']) if '$oid' in questionId else ObjectId(questionId)}, 
+                print(result['savedBy'])
+                mongo.db.questions.update_one({'_id':ObjectId(questionId['$oid']) if '$oid' in questionId else ObjectId(questionId)}, 
                                       {'$set': {'savedBy':result['savedBy']}})
                 return "User added to Question!"
             else:
