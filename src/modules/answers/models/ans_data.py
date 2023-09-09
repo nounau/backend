@@ -26,24 +26,40 @@ class ans_data:
                                     'createdTimeStamp':_createdTimeStamp, 'updatedTimeStamp':_updatedTimeStamp, 'isQualifiedRealTime':_isQualifiedRealTime})
     
     @staticmethod
-    def getAnswerById(aia):
+    def updatelike(answerId, isLiked):
         mongo = mongo_utils.get_mongo()
-        print(mongo)
+        result = mongo.db.answers.find_one({'_id':ObjectId(answerId)})
+        if result:
+            if isLiked == "yes":
+                result['likes'] += 1
+                mongo.db.answers.update_one({'_id':ObjectId(answerId['$oid']) if '$oid' in answerId else ObjectId(answerId)}, 
+                                      {'$set': {'likes':result['likes']}})
+                return "Liked!"
+            elif isLiked == "no":
+                result['likes'] -= 1
+                mongo.db.answers.update_one({'_id':ObjectId(answerId['$oid']) if '$oid' in answerId else ObjectId(answerId)}, 
+                                      {'$set': {'likes':result['likes']}})
+                return "Disliked"
+        return result    
+
+    @staticmethod
+    def getAnswerById(id):
+        mongo = mongo_utils.get_mongo()
         return mongo.db.answers.find_one({'_id':ObjectId(id)})
+    
+    @staticmethod
+    def getAllAnswers():
+        mongo = mongo_utils.get_mongo()
+        return mongo.db.answers.find()
 
     @staticmethod
     def updateAnswer(aia):
         mongo = mongo_utils.get_mongo()
-        _id = aia[0]
-        _questionId = aia[1]
-        _answer = aia[2]
-        _userId = aia[3]
-        _likes = aia[4]
-        _comments = aia[5]
-        _createdTimeStamp = aia[6]
-        _updatedTimeStamp = aia[7]
-        _isQualifiedRealTime = aia[8]
+        _answerId = aia[0]
+        _answer = aia[1]
+        _userId = aia[2]
+        _updatedTimeStamp = aia[3]
+        _isQualifiedRealTime = aia[4]
         
-        return mongo.db.answers.update_one({'_id':ObjectId(_id['$oid']) if '$oid' in _id else ObjectId(_id)}, 
-                                      {'$set': {'questionId':_questionId, 'answer':_answer, 'userId':_userId, 'likes':_likes, 'comments':_comments, 
-                                    'createdTimeStamp':_createdTimeStamp, 'updatedTimeStamp':_updatedTimeStamp, 'isQualifiedRealTime':_isQualifiedRealTime}})
+        return mongo.db.answers.update_one({'_id':ObjectId(_answerId['$oid']) if '$oid' in _answerId else ObjectId(_answerId)}, 
+                                      {'$set': {'answer':_answer, 'userId':_userId, 'updatedTimeStamp':_updatedTimeStamp, 'isQualifiedRealTime':_isQualifiedRealTime}})

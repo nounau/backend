@@ -7,13 +7,13 @@ class com_service:
         return com_data.postComment(comment_info_array)
     
     @staticmethod
-    def getCommentById(id):
-        return com_data.getCommentById(id)
+    def getCommentById(commentId, current_user):
+        return com_data.getCommentById(commentId, current_user)
     
     @staticmethod
     def updateComment(comment_info_array):
         return com_data.updateComment(comment_info_array)
     
     @staticmethod
-    def deleteCommentById(id):
-        return com_data.deleteCommentById(id)
+    def deleteCommentById(commentId, current_user):
+        return com_data.deleteCommentById(commentId, current_user)

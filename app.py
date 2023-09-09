@@ -6,6 +6,10 @@ from src.modules.user.routes.routes import data_bp
 from src.modules.authentication.routes.auth_routes import auth_bp
 from src.modules.questions.routes.q_routes import question_bp
 from src.modules.answers.routes.ans_routes import answer_bp
+from src.modules.comments.routes.com_routes import comment_bp
+from src.modules.rewards.routes.rw_routes import rewards_bp
+from src.modules.subscription.routes.sb_routes import subscribe_bp
+from src.modules.follow.routes.f_routes import follow_bp
 from dynaconf import Dynaconf, settings
 import json
 from flask import Flask, request, jsonify
@@ -23,6 +27,10 @@ app.register_blueprint(data_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(question_bp)
 app.register_blueprint(answer_bp)
+app.register_blueprint(comment_bp)
+app.register_blueprint(rewards_bp)
+app.register_blueprint(subscribe_bp)
+app.register_blueprint(follow_bp)
 app.secret_key = "secretkey"
 
 

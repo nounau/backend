@@ -18,6 +18,7 @@ def postQuestion():
     
     _json = request.json
     _title = _json['title']
+    _description = _json['description']
     _userId = current_user
     _savedBy = _json['savedBy']
     _noOfReposts = _json['noOfReposts']
@@ -27,13 +28,11 @@ def postQuestion():
     _tags = _json['tags']
     _views = _json['views']
 
-    question_info_array = [_title, _userId, _savedBy, _noOfReposts, _isRealTime, _createdTimeStamp, _updatedTimeStamp, _tags, _views]
+    question_info_array = [_title, _description, _userId, _savedBy, _noOfReposts, _isRealTime, _createdTimeStamp, _updatedTimeStamp, _tags, _views]
 
     if _title and request.method == "POST":
 
         id = q_service.postQuestion(question_info_array)
-        # id = mongo.db.questions.insert_one({'title':_title, 'uId':_uId, 'noOfReposts':_noOfReposts, 'isRealTime':_isRealTime, 
-        #                            'createdTimeStamp':_createdTimeStamp, 'updatedTimeStamp':_updatedTimeStamp, 'tags':_tags})
         
         return jsonify({'success': True, 'message': 'Question created successfully!', 'response': ''}), 200
     else:
@@ -45,11 +44,9 @@ def getQuestion():
     current_user = get_jwt_identity()
     if not current_user:
         return jsonify({'success': False, 'message': 'UnAutorized Access', 'response': ''}), 401
-    # print(current_user)
     
     _json = request.json
     id = _json['questionId']
-    # print(id)
     question = q_service.getQuestionById(id, current_user)
     if question:
         resp = json_util.dumps(question)
@@ -66,23 +63,24 @@ def editQuestion():
     _json = request.json
     _id = _json['questionId']
     _title = _json['title']
+    _description = _json['description']
     _userId = current_user
     _savedBy = _json['savedBy']
     _noOfReposts = _json['noOfReposts']
     _isRealTime = _json['isRealTime']
-    _createdTimeStamp = datetime.utcnow()
     _updatedTimeStamp = datetime.utcnow()
     _tags = _json['tags']
     _views = _json['views']
 
-    question_info_array = [_id, _title, _userId, _savedBy, _noOfReposts, _isRealTime, _createdTimeStamp, _updatedTimeStamp, _tags, _views]
+    question_info_array = [_id, _title, _description, _userId, _savedBy, _noOfReposts, _isRealTime, _updatedTimeStamp, _tags, _views]
 
 
     if _title and request.method == "POST":
         
         id = q_service.updateQuestion(question_info_array)
+        print("Question Id : "+id)
         
-        return jsonify({'success': True, 'message': 'User updated successfully!', 'response': ''}), 200
+        return jsonify({'success': True, 'message': 'Question updated successfully!', 'response': ''}), 200
     else:
         return not_found()
     

@@ -13,7 +13,6 @@ def postAnswer():
     current_user = get_jwt_identity()
     if not current_user:
         return jsonify({'success': False, 'message': 'UnAutorized Access', 'response': ''}), 401
-    print("In post Answer: "+current_user)
 
     _json = request.json
     _questionId = _json['questionId']
@@ -34,47 +33,76 @@ def postAnswer():
         return jsonify({'success': True, 'message': 'Answer posted successfully', 'response': ''}), 200
     else:
         return not_found()
-
-@answer_bp.route('/getanswer/<id>', methods=['GET'])
+    
+@answer_bp.route('/updatelike', methods=['POST'])
 @jwt_required()
-def getAnswer(id):
+def updatelike():
     current_user = get_jwt_identity()
     if not current_user:
         return jsonify({'success': False, 'message': 'UnAutorized Access', 'response': ''}), 401
     
-    ans = ans_service.getAnswerById(id)
-    if ans:
-        resp = json_util.dumps(ans)
-        #json.loads(json_util.dumps(data))
-        return resp
+    _json = request.json
+    _answerId = _json['answerId']
+    _isLiked = _json['isLiked']
+    if _isLiked and request.method == "POST":
+        result = ans_service.updatelike(_answerId, _isLiked)
+        return jsonify({'success': True, 'message': 'Like Updated Successfully', 'response': result}), 200
+    else:
+        return not_found()    
+
+@answer_bp.route('/getanswer', methods=['POST'])
+@jwt_required()
+def getAnswer():
+    current_user = get_jwt_identity()
+    if not current_user:
+        return jsonify({'success': False, 'message': 'UnAutorized Access', 'response': ''}), 401
+    
+    _json = request.json
+    _answerId = _json['answerId']
+    if _answerId and request.method == "POST":
+        ans = ans_service.getAnswerById(_answerId)
+        if ans:
+            resp = json_util.dumps(ans)
+            return jsonify({'success': True, 'message': 'Answer Found', 'response': resp}), 200
+        return ans
+    else:
+        return not_found()
+    
+@answer_bp.route('/getallanswers', methods=['POST'])
+@jwt_required()
+def getAllAnswers():
+    current_user = get_jwt_identity()
+    if not current_user:
+        return jsonify({'success': False, 'message': 'UnAutorized Access', 'response': ''}), 401
+    
+    if request.method == "POST":
+        ans = ans_service.getAllAnswers()
+        if ans:
+            resp = json_util.dumps(ans)
+            return jsonify({'success': True, 'message': 'All answers Found', 'response': resp}), 200
     else:
         return not_found()
 
-@answer_bp.route('/updateanswer/<id>', methods=['PUT'])
+@answer_bp.route('/updateanswer', methods=['POST'])
 @jwt_required()
-def editAnswer(id):
+def editAnswer():
     current_user = get_jwt_identity()
     if not current_user:
         return jsonify({'success': False, 'message': 'UnAutorized Access', 'response': ''}), 401
     
-    _id = id
     _json = request.json
-    _questionId = _json['questionId']
+    _answerId = _json['answerId']
     _answer = _json['answer']
     _userId = current_user
-    _likes = _json['likes']
-    _comments = _json['comments']
-    _createdTimeStamp = datetime.utcnow()
     _updatedTimeStamp = datetime.utcnow()
     _isQualifiedRealTime = _json['isQualifiedRealTime']
 
-    answer_info_array = [_id, _questionId, _answer, _userId, _likes, _comments, _createdTimeStamp, _updatedTimeStamp, _isQualifiedRealTime]
+    answer_info_array = [_answerId, _answer, _userId, _updatedTimeStamp, _isQualifiedRealTime]
 
-    if _questionId and _answer and request.method == "POST":
+    if _answerId and _answer and request.method == "POST":
 
         id = ans_service.updateAnswer(answer_info_array)
-        # id = mongo.db.questions.insert_one({'title':_title, 'uId':_uId, 'noOfReposts':_noOfReposts, 'isRealTime':_isRealTime, 
-        #                            'createdTimeStamp':_createdTimeStamp, 'updatedTimeStamp':_updatedTimeStamp, 'tags':_tags})
+        print(id.upserted_id)
         
         return jsonify({'ok': True, 'message': 'Answer updated successfully!', 'response': ''}), 200
     else:

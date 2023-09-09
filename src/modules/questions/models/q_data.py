@@ -17,16 +17,17 @@ class q_data:
     def postQuestion(qia):
         mongo = mongo_utils.get_mongo()
         _title = qia[0]
-        _userId = qia[1]
-        _savedBy = qia[2]
-        _noOfReposts = qia[3]
-        _isRealTime = qia[4]
-        _createdTimeStamp = qia[5]
-        _updatedTimeStamp = qia[6]
-        _tags = qia[7]
-        _views = qia[8]
+        _description = qia[1]
+        _userId = qia[2]
+        _savedBy = qia[3]
+        _noOfReposts = qia[4]
+        _isRealTime = qia[5]
+        _createdTimeStamp = qia[6]
+        _updatedTimeStamp = qia[7]
+        _tags = qia[8]
+        _views = qia[9]
 
-        return mongo.db.questions.insert_one({'title':_title, 'userId':_userId, 'savedBy':_savedBy, 'noOfReposts':_noOfReposts, 'isRealTime':_isRealTime, 
+        return mongo.db.questions.insert_one({'title':_title, 'description':_description, 'userId':_userId, 'savedBy':_savedBy, 'noOfReposts':_noOfReposts, 'isRealTime':_isRealTime, 
                                     'createdTimeStamp':_createdTimeStamp, 'updatedTimeStamp':_updatedTimeStamp, 'tags':_tags, 'views':_views})
     
     @staticmethod
@@ -47,18 +48,18 @@ class q_data:
         mongo = mongo_utils.get_mongo()
         _id = qia[0]
         _title = qia[1]
-        _userId = qia[2]
-        _savedBy = qia[3]
-        _noOfReposts = qia[4]
-        _isRealTime = qia[5]
-        _createdTimeStamp = qia[6]
+        _description = qia[2]
+        _userId = qia[3]
+        _savedBy = qia[4]
+        _noOfReposts = qia[5]
+        _isRealTime = qia[6]
         _updatedTimeStamp = qia[7]
         _tags = qia[8]
         _views = qia[9]
 
         return mongo.db.questions.update_one({'_id':ObjectId(_id['$oid']) if '$oid' in _id else ObjectId(_id)}, 
-                                      {'$set': {'title':_title, 'userId':_userId, 'savedBy':_savedBy, 'noOfReposts':_noOfReposts, 'isRealTime':_isRealTime, 
-                                    'createdTimeStamp':_createdTimeStamp, 'updatedTimeStamp':_updatedTimeStamp, 'tags':_tags, 'views':_views}})
+                                      {'$set': {'title':_title, 'description':_description, 'userId':_userId, 'savedBy':_savedBy, 'noOfReposts':_noOfReposts, 'isRealTime':_isRealTime, 
+                                     'updatedTimeStamp':_updatedTimeStamp, 'tags':_tags, 'views':_views}})
     
     @staticmethod
     def savedBy(current_user, questionId):

@@ -15,40 +15,35 @@ class com_data:
     @staticmethod
     def postComment(cia):
         mongo = mongo_utils.get_mongo()
-        _uId = cia['uId']
-        _questionId = cia['questionId']
-        _answerId = cia['answerId']
-        _commentType = cia['commentType']
-        _comment = cia['comment']
-        _createdTimeStamp = cia['createdTimeStamp']
-        _updatedTimeStamp = cia['updatedTimeStamp']
+        _userId = cia[0]
+        _questionId = cia[1]
+        _answerId = cia[2]
+        _commentType = cia[3]
+        _comment = cia[4]
+        _createdTimeStamp = cia[5]
+        _updatedTimeStamp = cia[6]
 
-        return mongo.db.comments.insert_one({'uId':_uId, 'questionId':_questionId, 'answerId':_answerId, 'commentType':_commentType, 'comment':_comment,
+        return mongo.db.comments.insert_one({'userId':_userId, 'questionId':_questionId, 'answerId':_answerId, 'commentType':_commentType, 'comment':_comment,
                                     'createdTimeStamp':_createdTimeStamp, 'updatedTimeStamp':_updatedTimeStamp})
     
     @staticmethod
-    def getCommentById(id):
+    def getCommentById(commentId, current_user):
         mongo = mongo_utils.get_mongo()
         print(mongo)
-        return mongo.db.comments.find_one({'_id':ObjectId(id)})
+        return mongo.db.comments.find_one({'_id':ObjectId(commentId)})
     
     @staticmethod
     def updateComment(cia):
         mongo = mongo_utils.get_mongo()
-        _id = cia[0]
-        _uId = cia[1]
-        _questionId = cia[2]
-        _answerId = cia[3]
-        _commentType = cia[4]
-        _comment = cia[5]
-        _createdTimeStamp = cia[6]
-        _updatedTimeStamp =cia[7]
+        _commentId = cia[0]
+        _userId = cia[1]
+        _comment = cia[2]
+        _updatedTimeStamp =cia[3]
 
-        return mongo.db.comments.update_one({'_id':ObjectId(_id['$oid']) if '$oid' in _id else ObjectId(_id)}, 
-                                      {'$set': {'uId':_uId, 'questionId':_questionId, 'answerId':_answerId, 'commentType':_commentType, 'comment':_comment,
-                                    'createdTimeStamp':_createdTimeStamp, 'updatedTimeStamp':_updatedTimeStamp}})
+        return mongo.db.comments.update_one({'_id':ObjectId(_commentId['$oid']) if '$oid' in _commentId else ObjectId(_commentId)}, 
+                                      {'$set': {'comment':_comment, 'updatedTimeStamp':_updatedTimeStamp}})
     
     @staticmethod
-    def deleteCommentById(id):
-        _id = id
-        return mongo.db.comments.filter_by(id=_id).delete() 
+    def deleteCommentById(commentId, current_user):
+        mongo = mongo_utils.get_mongo()
+        return mongo.db.comments.delete_one({'_id':ObjectId(commentId['$oid']) if '$oid' in commentId else ObjectId(commentId)})
