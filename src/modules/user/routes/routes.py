@@ -4,12 +4,13 @@ from src.modules.user.models.data import Data
 
 data_bp = Blueprint('data_bp', __name__)
 
-@data_bp.route('/api/data', methods=['GET'])
+@data_bp.route('/users', methods=['GET'])
 def get_data():
     data = Service.get_all_data()
-    return jsonify(data)
+    print(data)
+    # return jsonify(data)
 
-@data_bp.route('/api/data', methods=['POST'])
+@data_bp.route('/addusers', methods=['POST'])
 def add_data():
     new_data = request.get_json()
     Data.add_data(new_data)

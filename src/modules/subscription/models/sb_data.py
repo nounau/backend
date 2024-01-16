@@ -38,14 +38,14 @@ class sb_data:
     @staticmethod
     def updateSubscription(sia):
         mongo = mongo_utils.get_mongo()
-        _subscriptionId = sia[0],
+        subscriptionId = sia[0],
         _userId = sia[1],
         _purchaseDate = sia[2],
         _endDate = sia[3],
         _purchaseAmount = sia[4],
         _modeOfpayment = sia[5]
 
-        return mongo.db.subscription.update_one({'_id':ObjectId(_subscriptionId['$oid']) if '$oid' in _subscriptionId else ObjectId(_subscriptionId)}, 
+        return mongo.db.subscription.update_one({'_id':ObjectId(subscriptionId['$oid']) if '$oid' in subscriptionId else ObjectId(subscriptionId)}, 
                                       {'$set': {'purchaseDate':_purchaseDate, 'endDate':_endDate, 
                                             'purchaseAmount':_purchaseAmount, 'modeOfpayment':_modeOfpayment}})
     

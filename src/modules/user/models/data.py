@@ -11,8 +11,8 @@ users = db['user']
 class Data:
     @staticmethod
     def get_all_data():
-        #return users.find({})
-        return settings.MONGO_DB_URL
+        return users.find()
+        # return settings.MONGO_DB_URL
 
     @staticmethod
     def add_data(data):

@@ -16,9 +16,9 @@ def postSubscription():
     
     _json = request.json
     _userId = current_user
-    _purchaseDate =_json['purchaseDate'], 
-    _endDate = _json['endDate'], 
-    _purchaseAmount = _json['purchaseAmount'], 
+    _purchaseDate =_json['purchaseDate']
+    _endDate = _json['endDate']
+    _purchaseAmount = _json['purchaseAmount']
     _modeOfpayment = _json['modeOfpayment']
 
     subscription_info_array = [_userId, _purchaseDate, _endDate, _purchaseAmount, _modeOfpayment]
@@ -47,7 +47,7 @@ def getSubscription():
     else:
         return not_found()
     
-@subscribe_bp.route('/getallrewards', methods=['POST'])
+@subscribe_bp.route('/getallsubscriptions', methods=['POST'])
 @jwt_required()
 def getAllSubscriptions():
     current_user = get_jwt_identity()
