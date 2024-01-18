@@ -1,9 +1,13 @@
 from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, unset_jwt_cookies, jwt_required, JWTManager
 from src.modules.authentication.service.auth_service import auth_service
+from src.modules.mailTemplates.routes.mailTemplate_routes import getMailTemplate
+from src.modules.authentication.models.otp import otp
+from src.modules.common.mailUtility import mailUtility
 from werkzeug.security import generate_password_hash, check_password_hash
 from src.modules.common.app_utils import app_utils
 from flask import Blueprint, Flask, request, jsonify
 from datetime import datetime, timedelta, timezone
+import random
 
 # app = app_utils.get_app()
 auth_bp = Blueprint('auth_bp', __name__)
@@ -83,9 +87,33 @@ def register():
         #                                'birthdate':_birthdate, 'currentLocation':_currentLocation, 'city':_city, 'degree':_degree, 'startDate':_startDate, 'endDate':_endDate,
         #                                'companyName':_companyName, 'workExperience':_workExperience, 'photo':_photo, 'guestIpAddress':_guestIpAddress, 'lastActiveTimeStamp':_lastActiveTimeStamp})
 
+    
+        OTP = random.randint(100000,999999);
+
+        replacements = [];
+        replacements.append({"target": "OTP", "value": str(OTP)})
+        mailObj = getMailTemplate("NEW_USER", replacements)
+
+        # mailObj.to = _email
+        mailUtility.sendMail(mailObj, _email)
+
+        #temp
+        exp_Time = None
+        otp.save_otp(_email, OTP, exp_Time)
+
         return jsonify({'success': True, 'message': 'User created successfully!', 'response': ''}), 200
     else:
         return not_found()
+
+
+@auth_bp.route('/verifyOTP', methods=['GET'])
+def verifyOTP():
+    email_of_OTP = request.json.get('email', None)
+    if(otp.get_otp(email_of_OTP) == request.json.get('otp', None)):
+        return jsonify({'success': True, 'message': 'OTP verified!', 'response': ''}), 401
+    else:
+        return jsonify({'success': False, 'message': 'OTP verification failed!!', 'response': ''}), 200
+
 
 @auth_bp.route('/protected', methods=['GET'])
 @jwt_required()

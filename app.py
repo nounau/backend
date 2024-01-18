@@ -10,6 +10,7 @@ from src.modules.comments.routes.com_routes import comment_bp
 from src.modules.rewards.routes.rw_routes import rewards_bp
 from src.modules.subscription.routes.sb_routes import subscribe_bp
 from src.modules.follow.routes.f_routes import follow_bp
+from src.modules.mailTemplates.routes.mailTemplate_routes import mt_bp
 from dynaconf import Dynaconf, settings
 import json
 from flask import Flask, request, jsonify
@@ -31,6 +32,7 @@ app.register_blueprint(comment_bp)
 app.register_blueprint(rewards_bp)
 app.register_blueprint(subscribe_bp)
 app.register_blueprint(follow_bp)
+app.register_blueprint(mt_bp)
 app.secret_key = "secretkey"
 
 

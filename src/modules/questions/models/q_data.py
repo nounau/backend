@@ -41,6 +41,7 @@ class q_data:
                 newViews.append(current_user)
                 mongo.db.questions.update_one({'_id':ObjectId(id['$oid']) if '$oid' in id else ObjectId(id)}, 
                                       {'$set': {'views':newViews}})
+        result['_id'] = str(result['_id'])
         return result
     
     @staticmethod

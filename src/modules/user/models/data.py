@@ -19,6 +19,9 @@ class Data:
         # collection.insert_one(data)
         return None
     
+    def deleteUser(email):
+        return users.delete_one({'email': email});
+    
     @staticmethod
     def questionsSaved(current_user, questionId):
         mongo = mongo_utils.get_mongo()

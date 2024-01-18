@@ -15,3 +15,9 @@ def add_data():
     new_data = request.get_json()
     Data.add_data(new_data)
     return jsonify({'message': 'Data added successfully!'})
+
+@data_bp.route('/deleteUser', methods=['DELETE'])
+def deleteUser():
+    email = request.json.get('email', None)
+    Data.deleteUser(email)
+    return jsonify({'message': 'Data deleted successfully!'})

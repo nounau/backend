@@ -50,7 +50,9 @@ def getQuestion():
     question = q_service.getQuestionById(id, current_user)
     if question:
         resp = json_util.dumps(question)
-        return jsonify({'success': True, 'message': 'Found Question', 'response': resp}), 200
+        parsed_resp = json_util.loads(resp)
+        return jsonify({'success': True, 'message': 'Found Question', 'response': parsed_resp}), 200, {'Content-Type': 'application/json', 'indent': 2}
+
     else:
         return not_found()
     
