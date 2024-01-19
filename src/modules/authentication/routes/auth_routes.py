@@ -1,3 +1,4 @@
+import traceback
 from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, unset_jwt_cookies, jwt_required, JWTManager
 from src.modules.authentication.service.auth_service import auth_service
 from src.modules.mailTemplates.routes.mailTemplate_routes import getMailTemplate
@@ -23,7 +24,7 @@ def create_token(user):
     #         'user_email': user['email'],
     #         'exp' : datetime.utcnow() + timedelta(minutes = 30)
     #     }, app.config['SECRET_KEY'])
-    token = create_access_token(identity=user['userId'])
+    token = create_access_token(identity=user['_id'])
     return token
 
 @auth_bp.route('/login', methods=['POST'])
@@ -34,6 +35,8 @@ def login():
     print(user)
     if not user:
         return jsonify({'success': False, 'message': 'Invalid credentials', 'response':''}), 401
+    if (user['otpVerified'] == False):
+        return jsonify({'success': False, 'message': 'OTP verification required.', 'response':'', 'otpVerified': False}), 401
 
     access_token = create_token(user)
     return jsonify({'success': True, 'message': 'Login successful!', 'response':access_token}), 200
@@ -56,6 +59,7 @@ def register():
     _companyName = _json['companyName']
     _workExperience = _json['workExperience']
     _interests = _json['interests']
+    _education = _json['education']
     _languages = _json['languages']
     _photo = _json['photo']
     _savedQuestions = _json['savedQuestions']
@@ -63,19 +67,16 @@ def register():
     _answersGiven = _json['answersGiven']
     _rewards = _json['rewards']
     _guestIpAddress = _json['guestIpAddress']
+    _otpVerified = False
     _lastActiveTimeStamp = datetime.utcnow()
 
     register_info_array = [_uType, _userName, _password, _email, _name, _birthdate, _currentLocation, _city, _degree, 
-                           _startDate, _endDate, _companyName, _workExperience, _interests, _languages, _photo, 
-                           _savedQuestions, _questionsAsked, _answersGiven, _rewards, _guestIpAddress, _lastActiveTimeStamp]
+                           _startDate, _endDate, _companyName, _workExperience, _interests, _education, _languages, _photo, 
+                           _savedQuestions, _questionsAsked, _answersGiven, _rewards, _guestIpAddress, _otpVerified, _lastActiveTimeStamp]
 
     # try:
     if ifUserExists(_email):
         return jsonify({'success': False, 'message': 'User Already Exists', 'response': ''}), 200
-    # except TypeError:
-    #     print("No User Found")
-
-    
     
     
     if _userName and _email and _password and request.method == "POST":
@@ -83,10 +84,6 @@ def register():
         # _hashed_password = generate_password_hash(_password)
 
         id = auth_service.register(register_info_array)
-        # id = mongo.db.user.insert_one({'uType':_uType, 'userName':_userName, 'password':_hashed_password, 'email':_email, 'name':_name,
-        #                                'birthdate':_birthdate, 'currentLocation':_currentLocation, 'city':_city, 'degree':_degree, 'startDate':_startDate, 'endDate':_endDate,
-        #                                'companyName':_companyName, 'workExperience':_workExperience, 'photo':_photo, 'guestIpAddress':_guestIpAddress, 'lastActiveTimeStamp':_lastActiveTimeStamp})
-
     
         OTP = random.randint(100000,999999);
 
@@ -104,15 +101,50 @@ def register():
         return jsonify({'success': True, 'message': 'User created successfully!', 'response': ''}), 200
     else:
         return not_found()
+    
+@auth_bp.route('/SendOTPForResetPassword', method=['POST'])
+def SendOTPForResetPassword():
+    try:
+        _email = request.json.get('email',None)
+        OTP = random.randint(100000,999999);
 
+        replacements = [];
+        replacements.append({"target": "OTP", "value": str(OTP)})
+        mailObj = getMailTemplate("RESET_PASSWORD", replacements)
+
+        # mailObj.to = _email
+        mailUtility.sendMail(mailObj, _email)
+
+        #temp
+        exp_Time = None
+        otp.save_otp(_email, OTP, exp_Time)
+
+    except Exception as ex:
+        print(traceback.print_exception(type(ex), ex, ex.__traceback__))
+
+@auth_bp.route('/resetPassword', method=['POST'])
+def resetPassword():
+    try:
+        email_of_OTP = request.json.get('email',None)
+        _otp = request.json.get('otp',None)
+        _newPassword = request.json.get('newPassword',None)
+        
+        if(otp.get_otp(email_of_OTP) == _otp):
+            auth_service.resetPassword(email_of_OTP, _newPassword)
+            return jsonify({'success': True, 'message': 'Password reset successful.', 'response': ''}), 200
+        else:
+            return jsonify({'success': False, 'message': 'OTP verification failed for reset password.', 'response': ''}), 401
+
+    except Exception as ex:
+        print(traceback.print_exception(type(ex), ex, ex.__traceback__))
 
 @auth_bp.route('/verifyOTP', methods=['GET'])
 def verifyOTP():
     email_of_OTP = request.json.get('email', None)
     if(otp.get_otp(email_of_OTP) == request.json.get('otp', None)):
-        return jsonify({'success': True, 'message': 'OTP verified!', 'response': ''}), 401
+        return jsonify({'success': True, 'message': 'OTP verified!', 'response': ''}), 200
     else:
-        return jsonify({'success': False, 'message': 'OTP verification failed!!', 'response': ''}), 200
+        return jsonify({'success': False, 'message': 'OTP verification failed!!', 'response': ''}), 401
 
 
 @auth_bp.route('/protected', methods=['GET'])

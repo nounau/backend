@@ -1,6 +1,8 @@
+import traceback
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash
 from dynaconf import settings
+from bson import ObjectId
 
 from src.modules.common.mongo_utils import mongo_utils
 
@@ -14,7 +16,9 @@ class auth_data:
     def authenticate(email, password):
         user = users.find_one({'email' : email})
         if user and check_password_hash(user['password'], password):
-            return {'userId': str(user['_id']), 'email': user['email']}
+            # return {'userId': str(user['_id']), 'email': user['email']}
+            user['_id'] = str(user['_id'])
+            return user
         else:
             return None
     
@@ -35,22 +39,24 @@ class auth_data:
         _companyName = ria[11]
         _workExperience = ria[12]
         _interests = ria[13]
-        _languages = ria[14]
-        _photo = ria[15]
-        _savedQuestions = ria[16]
-        _questionsAsked = ria[17]
-        _answersGiven = ria[18]
-        _rewards = ria[19]
-        _guestIpAddress = ria[20]
-        _lastActiveTimeStamp = ria[21]
+        _education = ria[14]
+        _languages = ria[15]
+        _photo = ria[16]
+        _savedQuestions = ria[17]
+        _questionsAsked = ria[18]
+        _answersGiven = ria[19]
+        _rewards = ria[20]
+        _guestIpAddress = ria[21]
+        _otpVerified = ria[22]
+        _lastActiveTimeStamp = ria[23]
 
         m = mongo_utils.get_mongo()
         mongo = m
         return mongo.db.user.insert_one({'uType':_uType, 'userName':_userName, 'password':_password, 'email':_email, 'name':_name,
                                        'birthdate':_birthdate, 'currentLocation':_currentLocation, 'city':_city, 'degree':_degree, 'startDate':_startDate, 'endDate':_endDate,
-                                       'companyName':_companyName, 'workExperience':_workExperience, 'interests':_interests, 'languages':_languages,
+                                       'companyName':_companyName, 'workExperience':_workExperience, 'interests':_interests, 'education':_education, 'languages':_languages,
                                         'photo':_photo, 'savedQuestions':_savedQuestions, 'questionsAsked':_questionsAsked, 'answersGiven':_answersGiven, 
-                                        'rewards':_rewards, 'guestIpAddress':_guestIpAddress, 'lastActiveTimeStamp':_lastActiveTimeStamp})
+                                        'rewards':_rewards, 'guestIpAddress':_guestIpAddress, 'otpVerified':_otpVerified, 'lastActiveTimeStamp':_lastActiveTimeStamp})
 
     @staticmethod
     def ifUserExists(email):
@@ -62,3 +68,14 @@ class auth_data:
         except TypeError:
             print("No user Found!")
             return False
+        
+    @staticmethod
+    def resetPassword(email_of_OTP, _newPassword):
+        try:
+            user = users.find_one({'email': email_of_OTP})
+            _id = str(user['_id'])
+            return mongo_utils.get_mongo().db.user.update_one({'_id':ObjectId(_id['$oid']) if '$oid' in _id else ObjectId(_id)}, 
+                                      {'$set': {'password':_newPassword}})
+
+        except Exception as ex:
+            traceback.print_exception(type(ex), ex, ex.__traceback__)
