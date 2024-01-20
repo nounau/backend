@@ -17,3 +17,7 @@ class auth_service:
     @staticmethod
     def resetPassword(email_of_OTP, _newPassword):
         return auth_data.resetPassword(email_of_OTP, _newPassword)
+    
+    @staticmethod
+    def updateOtpVerifiedFlag(email_of_OTP, otpVerified):
+        auth_data.updateOtpVerifiedFlag(email_of_OTP, otpVerified)

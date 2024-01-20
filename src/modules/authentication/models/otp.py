@@ -1,3 +1,4 @@
+import traceback
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash
 from dynaconf import settings
@@ -11,11 +12,11 @@ otpColl = db['otp']
 class otp:
 
     @staticmethod
-    def save_otp(email, OTP, exp_Time):
+    def save_otp(email, OTP, exp_Time, status):
         # otpObj = otp.find_one({'email': email})
 
-        # return mongo_utils.get_mongo().otp.update({'email': email}, {'otp': OTP}, upsert=True);
-        return otpColl.insert_one({'email': email, 'otp': OTP, 'expTime': exp_Time});
+        return otpColl.update_one({'email':email}, {'$set': {'otp': OTP, 'expTime': exp_Time, 'status': status}})
+        # return otpColl.insert_one({'email': email, 'otp': OTP, 'expTime': exp_Time, 'status': status});
 
 
     @staticmethod
@@ -29,3 +30,10 @@ class otp:
         except TypeError:
             print("No OTP Found!")
             return False
+        
+    @staticmethod
+    def updateFlag(email, status):
+        try:
+            return otpColl.update_one({'email':email}, {'$set': {'status': status}})
+        except Exception as ex:
+            traceback.print_exception(type(ex), ex, ex.__traceback__)

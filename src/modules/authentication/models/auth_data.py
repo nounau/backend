@@ -74,8 +74,19 @@ class auth_data:
         try:
             user = users.find_one({'email': email_of_OTP})
             _id = str(user['_id'])
-            return mongo_utils.get_mongo().db.user.update_one({'_id':ObjectId(_id['$oid']) if '$oid' in _id else ObjectId(_id)}, 
-                                      {'$set': {'password':_newPassword}})
+            mongo_utils.get_mongo().db.user.update_one({'_id':ObjectId(_id['$oid']) if '$oid' in _id else ObjectId(_id)}, 
+                                      {'$set': {'password':generate_password_hash(_newPassword)}})
+
+        except Exception as ex:
+            traceback.print_exception(type(ex), ex, ex.__traceback__)
+
+    @staticmethod
+    def updateOtpVerifiedFlag(email, otpVerified):
+        try:
+            user = users.find_one({'email': email})
+            _id = str(user['_id'])
+            mongo_utils.get_mongo().db.user.update_one({'_id':ObjectId(_id['$oid']) if '$oid' in _id else ObjectId(_id)}, 
+                                      {'$set': {'otpVerified': otpVerified}})
 
         except Exception as ex:
             traceback.print_exception(type(ex), ex, ex.__traceback__)

@@ -96,13 +96,17 @@ def register():
 
         #temp
         exp_Time = None
-        otp.save_otp(_email, OTP, exp_Time)
+        # if(otp.get_otp(_email)):
+        #     otp.updateStatus(_email, "INACTIVE")
+        # else:
+        otp.save_otp(_email, OTP, exp_Time, "ACTIVE")
+        
 
         return jsonify({'success': True, 'message': 'User created successfully!', 'response': ''}), 200
     else:
         return not_found()
     
-@auth_bp.route('/SendOTPForResetPassword', method=['POST'])
+@auth_bp.route('/SendOTPForResetPassword', methods=['POST'])
 def SendOTPForResetPassword():
     try:
         _email = request.json.get('email',None)
@@ -117,12 +121,16 @@ def SendOTPForResetPassword():
 
         #temp
         exp_Time = None
-        otp.save_otp(_email, OTP, exp_Time)
+        # if(otp.get_otp(_email)):
+        #     otp.updateStatus(_email, "INACTIVE")
+        # else:
+        otp.save_otp(_email, OTP, exp_Time, "ACTIVE")
+        return jsonify({'success': True, 'message': 'Check the mail, OTP has been sent for paswword reset.', 'response': ''}), 200
 
     except Exception as ex:
         print(traceback.print_exception(type(ex), ex, ex.__traceback__))
 
-@auth_bp.route('/resetPassword', method=['POST'])
+@auth_bp.route('/resetPassword', methods=['POST'])
 def resetPassword():
     try:
         email_of_OTP = request.json.get('email',None)
@@ -131,6 +139,7 @@ def resetPassword():
         
         if(otp.get_otp(email_of_OTP) == _otp):
             auth_service.resetPassword(email_of_OTP, _newPassword)
+            # auth_service.updateOtpVerifiedFlag(email_of_OTP, True)
             return jsonify({'success': True, 'message': 'Password reset successful.', 'response': ''}), 200
         else:
             return jsonify({'success': False, 'message': 'OTP verification failed for reset password.', 'response': ''}), 401
@@ -142,6 +151,8 @@ def resetPassword():
 def verifyOTP():
     email_of_OTP = request.json.get('email', None)
     if(otp.get_otp(email_of_OTP) == request.json.get('otp', None)):
+        # otp.updateStatus(email_of_OTP, "INACTIVE")
+        auth_service.updateOtpVerifiedFlag(email_of_OTP, True)
         return jsonify({'success': True, 'message': 'OTP verified!', 'response': ''}), 200
     else:
         return jsonify({'success': False, 'message': 'OTP verification failed!!', 'response': ''}), 401
