@@ -15,7 +15,7 @@ class otp:
     def save_otp(email, OTP, exp_Time, status):
         # otpObj = otp.find_one({'email': email})
 
-        return otpColl.update_one({'email':email}, {'$set': {'otp': OTP, 'expTime': exp_Time, 'status': status}})
+        return otpColl.update_one({'email':email}, {'$set': {'otp': OTP, 'expTime': exp_Time, 'status': status}}, upsert=True)
         # return otpColl.insert_one({'email': email, 'otp': OTP, 'expTime': exp_Time, 'status': status});
 
 
