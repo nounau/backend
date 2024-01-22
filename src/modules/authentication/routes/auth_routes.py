@@ -106,8 +106,8 @@ def register():
     else:
         return not_found()
     
-@auth_bp.route('/SendOTPForResetPassword', methods=['POST'])
-def SendOTPForResetPassword():
+@auth_bp.route('/SendOTP', methods=['POST'])
+def SendOTP():
     try:
         _email = request.json.get('email',None)
         OTP = random.randint(100000,999999);
