@@ -1,4 +1,3 @@
-from dotenv import load_dotenv
 from flask import Flask
 from src.modules.common.app_utils import app_utils
 from src.modules.common.mongo_utils import mongo_utils
@@ -23,7 +22,7 @@ from datetime import datetime, timedelta, timezone
 from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, unset_jwt_cookies, jwt_required, JWTManager
 from flask_bcrypt import Bcrypt
 from pymongo import MongoClient
-import os
+
 app = Flask(__name__)
 app.register_blueprint(data_bp)
 app.register_blueprint(auth_bp)
@@ -36,9 +35,7 @@ app.register_blueprint(follow_bp)
 app.register_blueprint(mt_bp)
 app.secret_key = "secretkey"
 
-print("test 17", os.environ.get('SMTP_EMAILID'))
-load_dotenv('.flaskenv') #the path to your .env file (or any other file of environment variables you want to load)
-print("test 17", os.environ.get('SMTP_EMAILID'))
+
 app.config['MONGO_URI'] = settings.MONGO_DB_URL
 app.config["JWT_SECRET_KEY"] = "rohannitiket"
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=2)
