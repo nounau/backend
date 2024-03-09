@@ -10,8 +10,9 @@ app.config.from_object(Config)
 app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this!
 load_dotenv('.flaskenv') #the path to your .env file (or any other file of environment variables you want to load)
 
-from src.main import bp as main_bp
-app.register_blueprint(main_bp)
+@app.route('/')
+def index():
+    return 'This is The Main Blueprint'
 
 if __name__ == "__main__":
     app.run()
